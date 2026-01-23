@@ -72,6 +72,20 @@ final class UwayConnect
      * @param array<int, string> $scopes
      * @param array<string, string> $extras
      */
+    public function createSignupRequest(
+        array $scopes = [],
+        array $extras = [],
+        int $verifierLength = 64
+    ): AuthRequest {
+        $extras = array_merge(['screen' => 'signup'], $extras);
+
+        return $this->createAuthorizationRequest($scopes, $extras, $verifierLength);
+    }
+
+    /**
+     * @param array<int, string> $scopes
+     * @param array<string, string> $extras
+     */
     public function authorizationUrl(
         string $state,
         array $scopes = [],
@@ -95,6 +109,22 @@ final class UwayConnect
         }
 
         return rtrim($this->config->baseUrl, '/').'/oauth/authorize?'.http_build_query($query);
+    }
+
+    /**
+     * @param array<int, string> $scopes
+     * @param array<string, string> $extras
+     */
+    public function authorizationUrlForSignup(
+        string $state,
+        array $scopes = [],
+        ?string $codeChallenge = null,
+        string $codeChallengeMethod = 'S256',
+        array $extras = []
+    ): string {
+        $extras = array_merge(['screen' => 'signup'], $extras);
+
+        return $this->authorizationUrl($state, $scopes, $codeChallenge, $codeChallengeMethod, $extras);
     }
 
     /**
@@ -228,7 +258,3 @@ final class UwayConnect
         $this->logger->warning($message, $context);
     }
 }
-
-
-
-
