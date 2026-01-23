@@ -35,6 +35,24 @@ header('Location: '.$auth->url);
 exit;
 ```
 
+### 3.1) Cadastro com UWAY (opcional)
+
+Use quando quiser abrir direto a tela de cadastro do UWAY Auth.
+
+```php
+session_start();
+
+$auth = $uway->createSignupRequest(
+    scopes: ['openid', 'profile', 'email']
+);
+
+$_SESSION['uway_state'] = $auth->state;
+$_SESSION['uway_verifier'] = $auth->codeVerifier;
+
+header('Location: '.$auth->url);
+exit;
+```
+
 ## 4) Callback
 
 ```php

@@ -22,6 +22,7 @@ UWAY_AUTH_SCOPES="openid profile email"
 use App\Http\Controllers\UwayAuthController;
 
 Route::get('/auth/uway', [UwayAuthController::class, 'redirect'])->name('uway.redirect');
+Route::get('/auth/uway/signup', [UwayAuthController::class, 'signup'])->name('uway.signup');
 Route::get('/auth/uway/callback', [UwayAuthController::class, 'callback'])->name('uway.callback');
 ```
 
@@ -38,6 +39,16 @@ class UwayAuthController extends Controller
     public function redirect(Request $request)
     {
         $auth = UwayConnect::createAuthorizationRequest();
+
+        $request->session()->put('uway_state', $auth->state);
+        $request->session()->put('uway_verifier', $auth->codeVerifier);
+
+        return redirect()->away($auth->url);
+    }
+
+    public function signup(Request $request)
+    {
+        $auth = UwayConnect::createSignupRequest();
 
         $request->session()->put('uway_state', $auth->state);
         $request->session()->put('uway_verifier', $auth->codeVerifier);

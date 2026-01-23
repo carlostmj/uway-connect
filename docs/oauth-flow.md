@@ -19,6 +19,9 @@ Parametros obrigatorios:
 - `code_challenge`
 - `code_challenge_method=S256`
 
+Opcional (Cadastro com UWAY):
+- `screen=signup` (abre direto a tela de cadastro quando o usuario nao esta logado)
+
 ## 3) Callback
 
 - validar `state`

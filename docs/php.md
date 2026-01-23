@@ -31,6 +31,22 @@ header('Location: '.$auth->url);
 exit;
 ```
 
+## Rota /signup (Cadastro com UWAY)
+
+```php
+session_start();
+
+$auth = $uway->createSignupRequest([
+    'openid', 'profile', 'email'
+]);
+
+$_SESSION['uway_state'] = $auth->state;
+$_SESSION['uway_verifier'] = $auth->codeVerifier;
+
+header('Location: '.$auth->url);
+exit;
+```
+
 ## Rota /callback
 
 ```php
