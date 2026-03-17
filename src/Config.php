@@ -13,7 +13,7 @@ final class Config
         public readonly string $clientId,
         public readonly ?string $clientSecret,
         public readonly string $redirectUri,
-        public readonly array $defaultScopes = ['openid'],
+        public readonly array $defaultScopes = ['basic', 'openid'],
         public readonly int $timeoutSeconds = 15,
         public readonly bool $verifySsl = true
     ) {

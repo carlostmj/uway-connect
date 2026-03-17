@@ -1,11 +1,13 @@
 # UWAY Connect
 
-SDK oficial para integrar OAuth 2.1 do **UWAY Auth** em PHP puro e Laravel.
+SDK oficial para integrar OAuth 2.1 e OpenID Connect do **UWAY Auth** em PHP puro e Laravel.
 
 - Fluxo Authorization Code + PKCE (OAuth 2.1)
+- `client_credentials` para integrações server-to-server
 - Helpers para state/PKCE
-- Troca de code por tokens e userinfo
-- Integra��o simples no Laravel
+- Discovery OpenID do AUTH (`/.well-known/openid-configuration`)
+- Troca de code por tokens e `userinfo`
+- Integração simples no Laravel
 
 ## Instalacao
 
@@ -26,7 +28,7 @@ $uway = new UwayConnect(new Config(
     clientId: 'SEU_CLIENT_ID',
     clientSecret: null, // public client (SPA/mobile)
     redirectUri: 'https://seu-app.com/auth/uway/callback',
-    defaultScopes: ['openid', 'profile', 'email']
+    defaultScopes: ['basic', 'openid']
 ));
 ```
 
@@ -36,10 +38,27 @@ $uway = new UwayConnect(new Config(
 session_start();
 
 $request = $uway->createAuthorizationRequest([
-    'openid', 'profile', 'email'
+    'basic', 'openid'
 ]);
 
 // guarde na sessao
+$_SESSION['uway_state'] = $request->state;
+$_SESSION['uway_verifier'] = $request->codeVerifier;
+
+header('Location: '.$request->url);
+exit;
+```
+
+
+### 2.1) Cadastro com UWAY (opcional)
+
+```php
+session_start();
+
+$request = $uway->createSignupRequest([
+    'basic', 'openid'
+]);
+
 $_SESSION['uway_state'] = $request->state;
 $_SESSION['uway_verifier'] = $request->codeVerifier;
 
@@ -70,13 +89,14 @@ UWAY_AUTH_BASE_URL=https://auth.uway.com.br
 UWAY_AUTH_CLIENT_ID=...
 UWAY_AUTH_CLIENT_SECRET=...
 UWAY_AUTH_REDIRECT_URI=https://seu-app.com/auth/uway/callback
-UWAY_AUTH_SCOPES="openid profile email"
+UWAY_AUTH_SCOPES="basic openid"
 ```
 
 ### Rotas
 
 ```php
 Route::get('/auth/uway', [UwayAuthController::class, 'redirect'])->name('uway.redirect');
+Route::get('/auth/uway/signup', [UwayAuthController::class, 'signup'])->name('uway.signup');
 Route::get('/auth/uway/callback', [UwayAuthController::class, 'callback'])->name('uway.callback');
 ```
 
@@ -98,6 +118,17 @@ class UwayAuthController
         return redirect()->away($authRequest->url);
     }
 
+
+    public function signup(Request $request)
+    {
+        $authRequest = UwayConnect::createSignupRequest();
+
+        $request->session()->put('uway_state', $authRequest->state);
+        $request->session()->put('uway_verifier', $authRequest->codeVerifier);
+
+        return redirect()->away($authRequest->url);
+    }
+
     public function callback(Request $request)
     {
         $tokenSet = UwayConnect::exchangeCodeFromCallback(
@@ -112,6 +143,22 @@ class UwayAuthController
         return response()->json($profile);
     }
 }
+```
+
+## Discovery do AUTH
+
+```php
+$discovery = $uway->discovery();
+
+$discovery->accountCenterEndpoint;   // /account
+$discovery->accountProfileEndpoint;  // /account/profile
+$discovery->accountSecurityEndpoint; // /account/security
+```
+
+## Client credentials
+
+```php
+$tokens = $uway->clientCredentialsToken(['basic']);
 ```
 
 ## Tratamento de erros
@@ -139,8 +186,8 @@ Veja `docs/` para:
 
 ## Licenca
 
-MIT
-
-
-
-
+MIT
+
+
+
+

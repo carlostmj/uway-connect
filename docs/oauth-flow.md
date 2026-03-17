@@ -32,6 +32,22 @@ Opcional (Cadastro com UWAY):
 
 GET `/oauth/userinfo` com header `Authorization: Bearer <access_token>`
 
+O AUTH responde no formato:
+
+```json
+{
+  "status": "success",
+  "code": 200,
+  "message": "OK",
+  "data": {
+    "sub": "uuid",
+    "email": "user@example.com"
+  }
+}
+```
+
+O SDK faz o unwrap automatico de `data`.
+
 ## Erros comuns
 
 - `invalid_grant`: code expirado ou verifier incorreto

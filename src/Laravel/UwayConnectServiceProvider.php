@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace CarlosTMJ\UwayConnect\Laravel;
 
 use GuzzleHttp\Client;
+use Illuminate\Log\LogManager;
 use Illuminate\Support\ServiceProvider;
 use CarlosTMJ\UwayConnect\Config;
 use CarlosTMJ\UwayConnect\UwayConnect;
+use Psr\Log\LoggerInterface;
 
 class UwayConnectServiceProvider extends ServiceProvider
 {
@@ -28,11 +30,15 @@ class UwayConnectServiceProvider extends ServiceProvider
                 (bool) ($config['verify_ssl'] ?? true)
             );
 
-            return new UwayConnect($sdkConfig, new Client([
-                'base_uri' => rtrim($sdkConfig->baseUrl, '/').'/oauth/',
-                'timeout' => $sdkConfig->timeoutSeconds,
-                'verify' => $sdkConfig->verifySsl,
-            ]));
+            return new UwayConnect(
+                $sdkConfig,
+                new Client([
+                    'base_uri' => rtrim($sdkConfig->baseUrl, '/').'/oauth/',
+                    'timeout' => $sdkConfig->timeoutSeconds,
+                    'verify' => $sdkConfig->verifySsl,
+                ]),
+                $this->resolveLogger($app)
+            );
         });
     }
 
@@ -41,6 +47,17 @@ class UwayConnectServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__.'/../../config/uway-connect.php' => config_path('uway-connect.php'),
         ], 'uway-connect');
+    }
+
+    private function resolveLogger(mixed $app): ?LoggerInterface
+    {
+        /** @var LogManager $log */
+        $log = $app->make('log');
+        $hasDedicatedChannel = is_array($app['config']->get('logging.channels.uway_connect'));
+
+        return $hasDedicatedChannel
+            ? $log->channel('uway_connect')
+            : $log->driver();
     }
 }
 

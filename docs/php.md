@@ -11,7 +11,7 @@ $uway = new UwayConnect(new Config(
     clientId: 'SEU_CLIENT_ID',
     clientSecret: null,
     redirectUri: 'https://seu-app.com/auth/uway/callback',
-    defaultScopes: ['openid', 'profile', 'email']
+    defaultScopes: ['basic', 'openid']
 ));
 ```
 
@@ -21,7 +21,7 @@ $uway = new UwayConnect(new Config(
 session_start();
 
 $auth = $uway->createAuthorizationRequest([
-    'openid', 'profile', 'email'
+    'basic', 'openid'
 ]);
 
 $_SESSION['uway_state'] = $auth->state;
@@ -37,7 +37,7 @@ exit;
 session_start();
 
 $auth = $uway->createSignupRequest([
-    'openid', 'profile', 'email'
+    'basic', 'openid'
 ]);
 
 $_SESSION['uway_state'] = $auth->state;
@@ -71,6 +71,14 @@ try {
 
 ```php
 $newTokens = $uway->refreshToken($tokenSet->refreshToken);
+```
+
+## Discovery do AUTH
+
+```php
+$discovery = $uway->discovery();
+
+$accountCenter = $discovery->accountCenterEndpoint;
 ```
 
 ## Erros comuns

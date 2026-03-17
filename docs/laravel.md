@@ -13,7 +13,7 @@ UWAY_AUTH_BASE_URL=https://auth.uway.com.br
 UWAY_AUTH_CLIENT_ID=...
 UWAY_AUTH_CLIENT_SECRET=...
 UWAY_AUTH_REDIRECT_URI=https://seu-app.com/auth/uway/callback
-UWAY_AUTH_SCOPES="openid profile email"
+UWAY_AUTH_SCOPES="basic openid"
 ```
 
 ## Rotas
@@ -77,6 +77,8 @@ class UwayAuthController extends Controller
 - Sempre use HTTPS
 - Para apps publicos, nao envie client_secret
 - Guarde state/verifier somente em sessao
+- O AUTH devolve `success/error` com `data`, e o SDK ja desempacota isso
+- O discovery do AUTH inclui atalhos para `/account`, `/account/profile` e `/account/security`
 
 
 

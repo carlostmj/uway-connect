@@ -127,6 +127,26 @@ final class UwayConnect
         return $this->authorizationUrl($state, $scopes, $codeChallenge, $codeChallengeMethod, $extras);
     }
 
+    public function discovery(): DiscoveryDocument
+    {
+        try {
+            $response = $this->http->request('GET', '../.well-known/openid-configuration', [
+                'headers' => ['Accept' => 'application/json'],
+            ]);
+        } catch (GuzzleException $exception) {
+            $this->log('Erro ao consultar discovery document.', ['exception' => $exception->getMessage()]);
+            throw new UwayConnectException('Falha ao consultar discovery document.', null, ['error' => $exception->getMessage()]);
+        }
+
+        $payload = json_decode((string) $response->getBody(), true);
+
+        if (! is_array($payload)) {
+            throw new UwayConnectException('Resposta invalida do discovery document.', $response->getStatusCode());
+        }
+
+        return DiscoveryDocument::fromArray($this->unwrapPayload($payload));
+    }
+
     /**
      * @param array<string, mixed> $query
      */
@@ -192,6 +212,27 @@ final class UwayConnect
     }
 
     /**
+     * @param array<int, string> $scopes
+     * @param array<string, string> $extras
+     */
+    public function clientCredentialsToken(array $scopes = [], array $extras = []): TokenSet
+    {
+        $payload = array_merge([
+            'grant_type' => 'client_credentials',
+            'client_id' => $this->config->clientId,
+            'scope' => implode(' ', $scopes !== [] ? $scopes : $this->config->defaultScopes),
+        ], $extras);
+
+        if ($this->config->clientSecret !== null && $this->config->clientSecret !== '') {
+            $payload['client_secret'] = $this->config->clientSecret;
+        }
+
+        $response = $this->requestToken($payload);
+
+        return TokenSet::fromArray($response);
+    }
+
+    /**
      * @return array<string, mixed>
      */
     public function userInfo(string $accessToken): array
@@ -213,7 +254,7 @@ final class UwayConnect
             throw new UwayConnectException('Resposta invalida do userinfo.', $response->getStatusCode());
         }
 
-        return $payload;
+        return $this->unwrapPayload($payload);
     }
 
     /**
@@ -238,6 +279,8 @@ final class UwayConnect
             throw new UwayConnectException('Resposta invalida do token endpoint.', $response->getStatusCode());
         }
 
+        $data = $this->unwrapPayload($data);
+
         if (isset($data['error'])) {
             throw new UwayConnectException(
                 (string) ($data['error_description'] ?? $data['message'] ?? $data['error']),
@@ -249,6 +292,27 @@ final class UwayConnect
         return $data;
     }
 
+    /**
+     * @param array<string, mixed> $payload
+     * @return array<string, mixed>
+     */
+    private function unwrapPayload(array $payload): array
+    {
+        if (($payload['status'] ?? null) === 'error') {
+            throw new UwayConnectException(
+                (string) ($payload['message'] ?? 'Erro de integracao com UWAY Auth.'),
+                isset($payload['code']) ? (int) $payload['code'] : null,
+                $payload
+            );
+        }
+
+        if (($payload['status'] ?? null) === 'success' && isset($payload['data']) && is_array($payload['data'])) {
+            return $payload['data'];
+        }
+
+        return $payload;
+    }
+
     private function log(string $message, array $context = []): void
     {
         if (! $this->logger) {
@@ -258,3 +322,7 @@ final class UwayConnect
         $this->logger->warning($message, $context);
     }
 }
+
+
+
+

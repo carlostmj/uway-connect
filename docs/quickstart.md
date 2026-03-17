@@ -17,7 +17,7 @@ $uway = new UwayConnect(new Config(
     clientId: 'SEU_CLIENT_ID',
     clientSecret: null,
     redirectUri: 'https://seu-app.com/auth/uway/callback',
-    defaultScopes: ['openid', 'profile', 'email']
+    defaultScopes: ['basic', 'openid']
 ));
 ```
 
@@ -65,6 +65,12 @@ $tokenSet = $uway->exchangeCodeFromCallback(
 );
 
 $profile = $uway->userInfo($tokenSet->accessToken);
+```
+
+## 5) Ler discovery do AUTH
+
+```php
+$discovery = $uway->discovery();
 ```
 
 
