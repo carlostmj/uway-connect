@@ -61,6 +61,42 @@ $document = ExportCapabilityDocument::make([
 return response()->json($document->toArray());
 ```
 
+## Exemplo Laravel completo
+
+Existe um exemplo copiavel em:
+
+```text
+docs/examples/laravel-user-export-controller.php
+```
+
+Rotas sugeridas:
+
+```php
+use App\Http\Controllers\Internal\UserExportController;
+use Illuminate\Support\Facades\Route;
+
+Route::middleware(['auth:api'])->group(function (): void {
+    Route::get('/.well-known/uway-user-export', [UserExportController::class, 'capability']);
+    Route::post('/internal/user-exports', [UserExportController::class, 'start'])
+        ->name('internal.user-exports.start');
+    Route::get('/internal/user-exports/{exportId}', [UserExportController::class, 'status'])
+        ->name('internal.user-exports.status');
+    Route::get('/internal/user-exports/{exportId}/manifest', [UserExportController::class, 'manifest'])
+        ->name('internal.user-exports.manifest');
+    Route::get('/internal/user-exports/{exportId}/files/{fileId}', [UserExportController::class, 'file'])
+        ->name('internal.user-exports.file');
+});
+```
+
+O exemplo ja mostra:
+
+- documento `/.well-known/uway-user-export`
+- endpoint `start`
+- endpoint `status`
+- endpoint `manifest`
+- endpoint `file`
+- payload minimo esperado pelo AUTH
+
 ## Fluxo esperado
 
 1. O usuario solicita exportacao no AUTH.

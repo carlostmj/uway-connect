@@ -11,6 +11,10 @@ Bem-vindo ao **UWAY Connect**, a biblioteca oficial para integrar OAuth 2.1 e Op
 - `data-export.md`
 - `security.md`
 
+## Exemplos
+
+- `examples/laravel-user-export-controller.php`
+
 
 
 

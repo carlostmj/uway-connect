@@ -188,6 +188,12 @@ $document = ExportCapabilityDocument::make([
 return response()->json($document->toArray());
 ```
 
+Tambem existe um exemplo Laravel completo em:
+
+```text
+docs/examples/laravel-user-export-controller.php
+```
+
 ## Tratamento de erros
 
 Qualquer falha gera `UwayConnectException` com:
