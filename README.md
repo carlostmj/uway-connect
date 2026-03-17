@@ -146,6 +146,18 @@ class UwayAuthController
 }
 ```
 
+## Dois modos de login
+
+O pacote pode ser usado de 2 formas:
+
+- `interno`: seu app cria ou sincroniza usuario local
+- `AUTH-only`: seu app usa apenas a identidade remota do UWAY AUTH
+
+Detalhes completos:
+
+- `docs/laravel.md`
+- `docs/login-modes.md`
+
 ## Discovery do AUTH
 
 ```php
@@ -188,11 +200,9 @@ $document = ExportCapabilityDocument::make([
 return response()->json($document->toArray());
 ```
 
-Tambem existe um exemplo Laravel completo em:
+O controller completo tambem esta disponivel em:
 
-```text
-docs/examples/laravel-user-export-controller.php
-```
+- `docs/examples/laravel-user-export-controller.php`
 
 ## Tratamento de erros
 
@@ -215,6 +225,7 @@ Veja `docs/` para:
 - `oauth-flow.md`
 - `php.md`
 - `laravel.md`
+- `login-modes.md`
 - `data-export.md`
 - `security.md`
 

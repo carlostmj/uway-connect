@@ -7,6 +7,7 @@ Bem-vindo ao **UWAY Connect**, a biblioteca oficial para integrar OAuth 2.1 e Op
 - `quickstart.md`
 - `php.md`
 - `laravel.md`
+- `login-modes.md`
 - `oauth-flow.md`
 - `data-export.md`
 - `security.md`
@@ -14,6 +15,8 @@ Bem-vindo ao **UWAY Connect**, a biblioteca oficial para integrar OAuth 2.1 e Op
 ## Exemplos
 
 - `examples/laravel-user-export-controller.php`
+- `examples/laravel-login-internal-controller.php`
+- `examples/laravel-login-auth-only-controller.php`
 
 
 

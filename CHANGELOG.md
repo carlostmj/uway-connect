@@ -7,6 +7,7 @@
 - Suporte a `client_credentials` no SDK
 - Helper para publicar o contrato `/.well-known/uway-user-export`
 - Exemplo Laravel completo do fluxo de exportacao entre apps
+- Documentacao dos 2 modos de login: interno e AUTH-only
 - Fallback de logger no provider Laravel para evitar erro de canal ausente
 - Testes reais de fluxo PHP e integracao Laravel 12 com Testbench
 

@@ -72,6 +72,84 @@ class UwayAuthController extends Controller
 }
 ```
 
+## Dois modos de login
+
+O pacote atende 2 cenarios:
+
+- `login interno`: o app cria ou sincroniza um usuario local apos o callback
+- `AUTH-only`: o app nao cria usuario local e usa apenas os dados/tokens vindos do AUTH
+
+### Modo 1: usuario interno do app
+
+```php
+namespace App\Http\Controllers;
+
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use CarlosTMJ\UwayConnect\Laravel\UwayConnectFacade as UwayConnect;
+
+class UwayInternalLoginController
+{
+    public function callback(Request $request)
+    {
+        $tokenSet = UwayConnect::exchangeCodeFromCallback(
+            $request->query(),
+            (string) $request->session()->pull('uway_state'),
+            (string) $request->session()->pull('uway_verifier')
+        );
+
+        $profile = UwayConnect::userInfo($tokenSet->accessToken);
+
+        $user = User::query()->updateOrCreate(
+            ['email' => $profile['email'] ?? null],
+            [
+                'name' => $profile['name'] ?? 'Conta UWAY',
+                'email' => $profile['email'] ?? null,
+                'uway_user_id' => $profile['sub'],
+            ]
+        );
+
+        Auth::login($user);
+
+        return redirect('/dashboard');
+    }
+}
+```
+
+### Modo 2: somente AUTH
+
+```php
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use CarlosTMJ\UwayConnect\Laravel\UwayConnectFacade as UwayConnect;
+
+class UwayAuthOnlyLoginController
+{
+    public function callback(Request $request)
+    {
+        $tokenSet = UwayConnect::exchangeCodeFromCallback(
+            $request->query(),
+            (string) $request->session()->pull('uway_state'),
+            (string) $request->session()->pull('uway_verifier')
+        );
+
+        $profile = UwayConnect::userInfo($tokenSet->accessToken);
+
+        $request->session()->put('uway_auth.token', $tokenSet->raw);
+        $request->session()->put('uway_auth.user', $profile);
+
+        return redirect('/dashboard');
+    }
+}
+```
+
+Exemplos completos:
+
+- `docs/examples/laravel-login-internal-controller.php`
+- `docs/examples/laravel-login-auth-only-controller.php`
+
 ## Observacoes
 
 - Sempre use HTTPS
