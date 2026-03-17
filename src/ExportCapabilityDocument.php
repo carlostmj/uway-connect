@@ -4,10 +4,18 @@ declare(strict_types=1);
 
 namespace CarlosTMJ\UwayConnect;
 
+/**
+ * Documento padrao usado pelos apps que participam da exportacao unificada.
+ */
 final class ExportCapabilityDocument
 {
+    /** Identificador oficial do contrato de exportacao entre apps. */
     public const SERVICE = 'uway-user-export';
+
+    /** Versao atual do contrato publicado pelo helper. */
     public const VERSION = '1.0';
+
+    /** Caminho well-known esperado pelo AUTH. */
     public const WELL_KNOWN_PATH = '/.well-known/uway-user-export';
 
     /**
@@ -42,6 +50,8 @@ final class ExportCapabilityDocument
     }
 
     /**
+     * Monta um documento padrao pronto para resposta JSON.
+     *
      * @param array{start: string, status: string, manifest: string, file: string, callback?: string} $endpoints
      * @param array<string, mixed> $auth
      * @param array<string, mixed> $userIdentifier
@@ -61,6 +71,8 @@ final class ExportCapabilityDocument
     }
 
     /**
+     * Converte o documento para um array serializavel.
+     *
      * @return array<string, mixed>
      */
     public function toArray(): array

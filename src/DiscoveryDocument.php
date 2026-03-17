@@ -4,10 +4,15 @@ declare(strict_types=1);
 
 namespace CarlosTMJ\UwayConnect;
 
+/**
+ * Documento de discovery OpenID retornado pelo UWAY AUTH.
+ */
 final class DiscoveryDocument
 {
     /**
      * @param array<string, mixed> $raw
+     * @param array<int, string> $scopesSupported
+     * @param array<int, string> $grantTypesSupported
      */
     public function __construct(
         public readonly string $issuer,

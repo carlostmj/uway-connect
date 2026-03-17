@@ -4,6 +4,12 @@ declare(strict_types=1);
 
 namespace CarlosTMJ\UwayConnect;
 
+/**
+ * Representa um redirecionamento de autenticacao pronto para envio ao navegador.
+ *
+ * Esse objeto concentra os dados que o app precisa guardar em sessao antes
+ * de enviar o usuario para o UWAY AUTH.
+ */
 final class AuthRequest
 {
     /**
@@ -22,6 +28,8 @@ final class AuthRequest
     }
 
     /**
+     * Converte a requisicao para um array serializavel.
+     *
      * @return array<string, mixed>
      */
     public function toArray(): array
@@ -37,7 +45,3 @@ final class AuthRequest
         ];
     }
 }
-
-
-
-

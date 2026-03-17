@@ -4,15 +4,21 @@ declare(strict_types=1);
 
 namespace CarlosTMJ\UwayConnect\Laravel;
 
+use CarlosTMJ\UwayConnect\Config;
+use CarlosTMJ\UwayConnect\UwayConnect;
 use GuzzleHttp\Client;
 use Illuminate\Log\LogManager;
 use Illuminate\Support\ServiceProvider;
-use CarlosTMJ\UwayConnect\Config;
-use CarlosTMJ\UwayConnect\UwayConnect;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Service provider responsavel por registrar o SDK no container do Laravel.
+ */
 class UwayConnectServiceProvider extends ServiceProvider
 {
+    /**
+     * Registra o cliente principal como singleton configurado via config.
+     */
     public function register(): void
     {
         $this->mergeConfigFrom(__DIR__.'/../../config/uway-connect.php', 'uway-connect');
@@ -25,7 +31,7 @@ class UwayConnectServiceProvider extends ServiceProvider
                 (string) ($config['client_id'] ?? ''),
                 $config['client_secret'] ?? null,
                 (string) ($config['redirect_uri'] ?? ''),
-                is_array($config['scopes'] ?? null) ? $config['scopes'] : ['openid'],
+                is_array($config['scopes'] ?? null) ? $config['scopes'] : ['basic', 'openid'],
                 (int) ($config['timeout'] ?? 15),
                 (bool) ($config['verify_ssl'] ?? true)
             );
@@ -42,6 +48,9 @@ class UwayConnectServiceProvider extends ServiceProvider
         });
     }
 
+    /**
+     * Publica o arquivo de configuracao do pacote.
+     */
     public function boot(): void
     {
         $this->publishes([
@@ -49,6 +58,9 @@ class UwayConnectServiceProvider extends ServiceProvider
         ], 'uway-connect');
     }
 
+    /**
+     * Resolve um logger dedicado quando existir, ou usa o logger padrao.
+     */
     private function resolveLogger(mixed $app): ?LoggerInterface
     {
         /** @var LogManager $log */
@@ -60,7 +72,3 @@ class UwayConnectServiceProvider extends ServiceProvider
             : $log->driver();
     }
 }
-
-
-
-

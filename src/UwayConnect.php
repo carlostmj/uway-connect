@@ -4,13 +4,19 @@ declare(strict_types=1);
 
 namespace CarlosTMJ\UwayConnect;
 
+use CarlosTMJ\UwayConnect\Support\Pkce;
+use CarlosTMJ\UwayConnect\Support\State;
 use GuzzleHttp\Client;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use Psr\Log\LoggerInterface;
-use CarlosTMJ\UwayConnect\Support\Pkce;
-use CarlosTMJ\UwayConnect\Support\State;
 
+/**
+ * Cliente principal do SDK para integracoes com o UWAY AUTH.
+ *
+ * Encapsula os fluxos de autenticacao, token, discovery e userinfo tanto para
+ * PHP puro quanto para projetos Laravel.
+ */
 final class UwayConnect
 {
     private ClientInterface $http;
@@ -27,6 +33,11 @@ final class UwayConnect
         ]);
     }
 
+    /**
+     * Gera um novo par PKCE com verifier, challenge e metodo.
+     *
+     * @return array{verifier: string, challenge: string, method: string}
+     */
     public function newPkcePair(int $verifierLength = 64): array
     {
         $verifier = Pkce::generateVerifier($verifierLength);
@@ -39,6 +50,8 @@ final class UwayConnect
     }
 
     /**
+     * Cria uma requisicao de autenticacao pronta para persistir em sessao.
+     *
      * @param array<int, string> $scopes
      * @param array<string, string> $extras
      */
@@ -69,6 +82,8 @@ final class UwayConnect
     }
 
     /**
+     * Cria uma requisicao de autenticacao forcando a tela de cadastro.
+     *
      * @param array<int, string> $scopes
      * @param array<string, string> $extras
      */
@@ -83,6 +98,8 @@ final class UwayConnect
     }
 
     /**
+     * Monta a URL de autorizacao do fluxo Authorization Code + PKCE.
+     *
      * @param array<int, string> $scopes
      * @param array<string, string> $extras
      */
@@ -112,6 +129,8 @@ final class UwayConnect
     }
 
     /**
+     * Monta a URL de autorizacao apontando direto para o cadastro.
+     *
      * @param array<int, string> $scopes
      * @param array<string, string> $extras
      */
@@ -127,6 +146,9 @@ final class UwayConnect
         return $this->authorizationUrl($state, $scopes, $codeChallenge, $codeChallengeMethod, $extras);
     }
 
+    /**
+     * Consulta o documento de discovery OpenID do AUTH.
+     */
     public function discovery(): DiscoveryDocument
     {
         try {
@@ -148,6 +170,8 @@ final class UwayConnect
     }
 
     /**
+     * Valida o callback do AUTH e troca o code por tokens.
+     *
      * @param array<string, mixed> $query
      */
     public function exchangeCodeFromCallback(array $query, string $expectedState, string $codeVerifier): TokenSet
@@ -170,6 +194,8 @@ final class UwayConnect
     }
 
     /**
+     * Troca um authorization code por tokens.
+     *
      * @param array<string, string> $extras
      */
     public function exchangeCode(string $code, string $codeVerifier, array $extras = []): TokenSet
@@ -192,6 +218,8 @@ final class UwayConnect
     }
 
     /**
+     * Renova um access token a partir de um refresh token valido.
+     *
      * @param array<string, string> $extras
      */
     public function refreshToken(string $refreshToken, array $extras = []): TokenSet
@@ -212,6 +240,8 @@ final class UwayConnect
     }
 
     /**
+     * Emite token server-to-server para apps confidenciais.
+     *
      * @param array<int, string> $scopes
      * @param array<string, string> $extras
      */
@@ -233,6 +263,8 @@ final class UwayConnect
     }
 
     /**
+     * Consulta o endpoint `userinfo` do AUTH com um access token valido.
+     *
      * @return array<string, mixed>
      */
     public function userInfo(string $accessToken): array
@@ -250,6 +282,7 @@ final class UwayConnect
         }
 
         $payload = json_decode((string) $response->getBody(), true);
+
         if (! is_array($payload)) {
             throw new UwayConnectException('Resposta invalida do userinfo.', $response->getStatusCode());
         }
@@ -258,6 +291,8 @@ final class UwayConnect
     }
 
     /**
+     * Executa uma chamada ao token endpoint e normaliza o envelope do AUTH.
+     *
      * @param array<string, string> $payload
      * @return array<string, mixed>
      */
@@ -293,6 +328,8 @@ final class UwayConnect
     }
 
     /**
+     * Desempacota o formato padrao `success/error + data` usado pelo AUTH.
+     *
      * @param array<string, mixed> $payload
      * @return array<string, mixed>
      */
@@ -313,6 +350,11 @@ final class UwayConnect
         return $payload;
     }
 
+    /**
+     * Registra avisos internos apenas quando um logger foi fornecido.
+     *
+     * @param array<string, mixed> $context
+     */
     private function log(string $message, array $context = []): void
     {
         if (! $this->logger) {
@@ -322,7 +364,3 @@ final class UwayConnect
         $this->logger->warning($message, $context);
     }
 }
-
-
-
-

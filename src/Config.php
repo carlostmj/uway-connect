@@ -6,8 +6,14 @@ namespace CarlosTMJ\UwayConnect;
 
 use InvalidArgumentException;
 
+/**
+ * Configuracao base usada pelo cliente do SDK.
+ */
 final class Config
 {
+    /**
+     * @param array<int, string> $defaultScopes
+     */
     public function __construct(
         public readonly string $baseUrl,
         public readonly string $clientId,
@@ -30,7 +36,3 @@ final class Config
         }
     }
 }
-
-
-
-

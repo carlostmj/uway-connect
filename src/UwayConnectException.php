@@ -6,8 +6,14 @@ namespace CarlosTMJ\UwayConnect;
 
 use RuntimeException;
 
+/**
+ * Excecao disparada pelo SDK quando a integracao com o AUTH falha.
+ */
 final class UwayConnectException extends RuntimeException
 {
+    /**
+     * @param array<string, mixed>|null $payload
+     */
     public function __construct(
         string $message,
         public readonly ?int $statusCode = null,
@@ -16,7 +22,3 @@ final class UwayConnectException extends RuntimeException
         parent::__construct($message);
     }
 }
-
-
-
-
