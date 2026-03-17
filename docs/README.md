@@ -8,6 +8,7 @@ Bem-vindo ao **UWAY Connect**, a biblioteca oficial para integrar OAuth 2.1 e Op
 - `php.md`
 - `laravel.md`
 - `oauth-flow.md`
+- `data-export.md`
 - `security.md`
 
 

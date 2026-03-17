@@ -5,6 +5,7 @@
 - Alinhamento dos defaults e da documentacao com os escopos reais do UWAY AUTH
 - Suporte a discovery OpenID (`/.well-known/openid-configuration`)
 - Suporte a `client_credentials` no SDK
+- Helper para publicar o contrato `/.well-known/uway-user-export`
 - Fallback de logger no provider Laravel para evitar erro de canal ausente
 - Testes reais de fluxo PHP e integracao Laravel 12 com Testbench
 

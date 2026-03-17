@@ -6,6 +6,7 @@ SDK oficial para integrar OAuth 2.1 e OpenID Connect do **UWAY Auth** em PHP pur
 - `client_credentials` para integrações server-to-server
 - Helpers para state/PKCE
 - Discovery OpenID do AUTH (`/.well-known/openid-configuration`)
+- Contrato padrão de exportação de dados entre apps (`/.well-known/uway-user-export`)
 - Troca de code por tokens e `userinfo`
 - Integração simples no Laravel
 
@@ -161,6 +162,32 @@ $discovery->accountSecurityEndpoint; // /account/security
 $tokens = $uway->clientCredentialsToken(['basic']);
 ```
 
+## Exportação de dados entre apps
+
+Quando um app conectado quiser participar da exportação unificada de dados da conta, ele deve expor:
+
+- `/.well-known/uway-user-export`
+- endpoint de início da exportação
+- endpoint de status
+- endpoint de manifesto
+- endpoint de download de arquivo
+
+O pacote agora inclui um builder para esse documento:
+
+```php
+use CarlosTMJ\UwayConnect\ExportCapabilityDocument;
+
+$document = ExportCapabilityDocument::make([
+    'start' => '/internal/user-exports',
+    'status' => '/internal/user-exports/{exportId}',
+    'manifest' => '/internal/user-exports/{exportId}/manifest',
+    'file' => '/internal/user-exports/{exportId}/files/{fileId}',
+    'callback' => '/internal/user-exports/callbacks/auth',
+]);
+
+return response()->json($document->toArray());
+```
+
 ## Tratamento de erros
 
 Qualquer falha gera `UwayConnectException` com:
@@ -182,6 +209,7 @@ Veja `docs/` para:
 - `oauth-flow.md`
 - `php.md`
 - `laravel.md`
+- `data-export.md`
 - `security.md`
 
 ## Licenca
